@@ -1,5 +1,6 @@
 package com.oxuegen.studentcard.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -55,4 +56,7 @@ public class Student {
     )
     private Integer age;
 
+//    @JsonIgnore
+//    @OneToOne(mappedBy = "student")
+    private StudentIdCard studentIdCard;
 }

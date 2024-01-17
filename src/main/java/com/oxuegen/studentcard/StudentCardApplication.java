@@ -2,11 +2,15 @@ package com.oxuegen.studentcard;
 
 import com.github.javafaker.Faker;
 import com.oxuegen.studentcard.model.Student;
+import com.oxuegen.studentcard.model.StudentIdCard;
+import com.oxuegen.studentcard.repository.StudentCardIdRepository;
 import com.oxuegen.studentcard.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -18,7 +22,8 @@ public class StudentCardApplication {
         SpringApplication.run(StudentCardApplication.class, args);
     }
     @Bean
-    CommandLineRunner commandLineRunner(StudentRepository studentRepository){
+    CommandLineRunner commandLineRunner(StudentRepository studentRepository,
+                                        StudentCardIdRepository studentCardIdRepository){
         return args -> {
             Faker faker = new Faker();
             for(int i = 0;i <= 20; i++){
@@ -38,9 +43,25 @@ public class StudentCardApplication {
         };
     }
 
+    private static Page<Student> getStudents(StudentRepository studentRepository) {
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                5,
+                Sort.by("firstName").ascending());
+        //sorting(studentRepository);
+        Page<Student> page = studentRepository.findAll(pageRequest);
+        return page;
+    }
+
+    private static void sorting(StudentRepository studentRepository) {
+        Sort sort = Sort.by("firstName").ascending().and(Sort.by("age").descending());
+        studentRepository.findAll(sort)
+                .forEach(System.out::println);
+    }
+
     private void generateRandomStudents(StudentRepository studentRepository){
         Faker faker = new Faker();
-        for(int i = 0;i <= 20; i++){
+        for(int i = 0; i < 20; i++){
             String firstName = faker.name().firstName();
             String lastName = faker.name().lastName();
             String email = String
