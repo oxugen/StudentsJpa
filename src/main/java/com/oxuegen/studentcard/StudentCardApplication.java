@@ -39,7 +39,7 @@ public class StudentCardApplication {
                     .findByEmail("p.dubrovskiy@mail.ru")
                     .ifPresentOrElse(System.out::println, () -> System.out.println("email not found"));
 
-            studentRepository.findStudentsByFirstNameEqualsAndAgeAfter(
+            studentRepository.findStudentsByFirstNameEqualsAndAgeAfterNative(
                     "Philip",
                     20
             ).forEach(System.out::println);
