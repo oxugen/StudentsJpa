@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -35,6 +36,26 @@ public class StudentCardApplication {
                 studentRepository.save(student);
             }
         };
+    }
+
+    private void generateRandomStudents(StudentRepository studentRepository){
+        Faker faker = new Faker();
+        for(int i = 0;i <= 20; i++){
+            String firstName = faker.name().firstName();
+            String lastName = faker.name().lastName();
+            String email = String
+                    .format("%s.%s@gmail.com", firstName, lastName)
+                    .toLowerCase();
+            Integer age = faker.number().numberBetween(17, 55);
+            Student student = Student.builder()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .age(age)
+                    .build();
+
+            studentRepository.save(student);
+        }
     }
 
 }
