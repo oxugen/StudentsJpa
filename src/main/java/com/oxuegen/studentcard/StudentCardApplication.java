@@ -1,5 +1,6 @@
 package com.oxuegen.studentcard;
 
+import com.github.javafaker.Faker;
 import com.oxuegen.studentcard.model.Student;
 import com.oxuegen.studentcard.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -18,31 +19,21 @@ public class StudentCardApplication {
     @Bean
     CommandLineRunner commandLineRunner(StudentRepository studentRepository){
         return args -> {
-            Student philip = Student
-                    .builder()
-                    .firstName("Philip")
-                    .lastName("Dubrovskiy")
-                    .email("p.dubrovskiy@mail.ru")
-                    .age(22)
-                    .build();
-            Student maria = Student
-                    .builder()
-                    .firstName("Maria")
-                    .lastName("Dubovick")
-                    .email("m.dubovick@mail.ru")
-                    .age(25)
-                    .build();
+            Faker faker = new Faker();
+            for(int i = 0;i <= 20; i++){
+                String firstName = faker.name().firstName();
+                String lastName = faker.name().lastName();
+                String email = String.format("%s.%s@gmail.com", firstName, lastName);
+                Integer age = faker.number().numberBetween(17, 55);
+                Student student = Student.builder()
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .email(email)
+                        .age(age)
+                        .build();
 
-            studentRepository.saveAll(List.of(philip, maria));
-
-            studentRepository
-                    .findByEmail("p.dubrovskiy@mail.ru")
-                    .ifPresentOrElse(System.out::println, () -> System.out.println("email not found"));
-
-            studentRepository.findStudentsByFirstNameEqualsAndAgeAfterNative(
-                    "Philip",
-                    20
-            ).forEach(System.out::println);
+                studentRepository.save(student);
+            }
         };
     }
 
