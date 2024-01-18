@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity(name = "Student")
 @Table(
         name = "student",
@@ -56,7 +59,58 @@ public class Student {
     )
     private Integer age;
 
-//    @JsonIgnore
-//    @OneToOne(mappedBy = "student")
+    @OneToOne(
+            mappedBy = "student",
+            orphanRemoval = true,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
     private StudentIdCard studentIdCard;
+
+    @ManyToMany(
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
+    @JoinTable(
+            name = "enrolment",
+            joinColumns = @JoinColumn(
+                    name = "student_id",
+                    foreignKey = @ForeignKey(name = "enrolment_student_id_fk")
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "course_id",
+                    foreignKey = @ForeignKey(name = "enrolment_course_id_fk")
+            )
+    )
+    private List<Course> courses = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "student",
+            orphanRemoval = true,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            fetch = FetchType.LAZY
+    )
+    private List<Book> books = new ArrayList<>();
+
+    public void addBook(Book book){
+        if(!books.contains(book)){
+            books.add(book);
+            book.setStudent(this);
+        }
+    }
+
+    public void removeBook(Book book){
+        if(this.books.contains(book)){
+            this.books.remove(book);
+            book.setStudent(null);
+        }
+    }
+
+    public void enrolToCourse(Course course){
+        courses.add(course);
+        course.getStudents().add(this);
+    }
+
+    public void unEnrolCourse(Course course){
+        courses.remove(course);
+        course.getStudents().remove(this);
+    }
 }

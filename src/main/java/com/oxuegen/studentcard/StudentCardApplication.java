@@ -1,6 +1,8 @@
 package com.oxuegen.studentcard;
 
 import com.github.javafaker.Faker;
+import com.oxuegen.studentcard.model.Book;
+import com.oxuegen.studentcard.model.Course;
 import com.oxuegen.studentcard.model.Student;
 import com.oxuegen.studentcard.model.StudentIdCard;
 import com.oxuegen.studentcard.repository.StudentCardIdRepository;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootApplication
@@ -26,20 +30,64 @@ public class StudentCardApplication {
                                         StudentCardIdRepository studentCardIdRepository){
         return args -> {
             Faker faker = new Faker();
-            for(int i = 0;i <= 20; i++){
-                String firstName = faker.name().firstName();
-                String lastName = faker.name().lastName();
-                String email = String.format("%s.%s@gmail.com", firstName, lastName);
-                Integer age = faker.number().numberBetween(17, 55);
-                Student student = Student.builder()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .email(email)
-                        .age(age)
-                        .build();
+            String firstName = faker.name().firstName();
+            String lastName = faker.name().lastName();
+            String email = String.format("%s.%s@gmail.com", firstName, lastName);
+            Integer age = faker.number().numberBetween(17, 55);
 
-                studentRepository.save(student);
-            }
+            Course course = Course
+                    .builder()
+                    .department("employee")
+                    .name("good course")
+                    .students(new ArrayList())
+                    .build();
+
+            Student student = Student.builder()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .age(age)
+                    .books(new ArrayList<>())
+                    .courses(new ArrayList<>())
+                    .build();
+
+            student.addBook(Book
+                    .builder()
+                    .bookName("Book 1")
+                    .createdAt(LocalDateTime.now().minusDays(4))
+                    .build());
+
+            student.addBook(Book
+                    .builder()
+                    .bookName("Book 2")
+                    .createdAt(LocalDateTime.now().minusDays(2))
+                    .build());
+
+            student.addBook(Book
+                    .builder()
+                    .bookName("Book 3")
+                    .createdAt(LocalDateTime.now().minusDays(1))
+                    .build());
+
+            student.enrolToCourse(course);
+
+            StudentIdCard studentIdCard = StudentIdCard
+                    .builder()
+                    .cardNumber("123456")
+                    .student(student)
+                    .build();
+
+            student.setStudentIdCard(studentIdCard);
+            studentRepository.save(student);
+
+            studentRepository.findById(1L)
+                    .ifPresent(s -> {
+                        System.out.println("Lazy fetch");
+                        List<Book> books = student.getBooks();
+                        books.forEach(book -> {
+                            System.out.println(s.getFirstName() + "got" + book.getBookName());
+                        });
+                    });
         };
     }
 

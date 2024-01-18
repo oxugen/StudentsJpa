@@ -45,10 +45,12 @@ public class StudentIdCard {
     )
     private String cardNumber;
 
-    @JsonIgnore
     @JoinColumn(
             name = "student_id",
-            referencedColumnName = "id"
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(
+                    name = "student_id_card_student_fk"
+            )
     )
     @OneToOne(
             cascade = CascadeType.ALL
