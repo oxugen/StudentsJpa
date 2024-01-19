@@ -32,10 +32,11 @@ public class Course {
     )
     private Long id;
 
-    @ManyToMany(
-            mappedBy = "courses"
+    @OneToMany(
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            mappedBy = "course"
     )
-    private List<Student> students = new ArrayList();
+    private List<Enrolment> enrolments = new ArrayList();
 
     @Column(
             name = "name",
@@ -50,4 +51,14 @@ public class Course {
             columnDefinition = "TEXT"
     )
     private String department;
+
+    public void addEnrolment(Enrolment enrolment){
+        if (!enrolments.contains(enrolment)) {
+            enrolments.add(enrolment);
+        }
+    }
+
+    public void removeEnrolment(Enrolment enrolment){
+        enrolments.remove(enrolment);
+    }
 }

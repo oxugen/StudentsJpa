@@ -1,10 +1,7 @@
 package com.oxuegen.studentcard;
 
 import com.github.javafaker.Faker;
-import com.oxuegen.studentcard.model.Book;
-import com.oxuegen.studentcard.model.Course;
-import com.oxuegen.studentcard.model.Student;
-import com.oxuegen.studentcard.model.StudentIdCard;
+import com.oxuegen.studentcard.model.*;
 import com.oxuegen.studentcard.repository.StudentCardIdRepository;
 import com.oxuegen.studentcard.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -39,7 +36,14 @@ public class StudentCardApplication {
                     .builder()
                     .department("employee")
                     .name("good course")
-                    .students(new ArrayList())
+                    .enrolments(new ArrayList())
+                    .build();
+
+            Course secondCourse = Course
+                    .builder()
+                    .department("customer")
+                    .name("great course")
+                    .enrolments(new ArrayList())
                     .build();
 
             Student student = Student.builder()
@@ -48,7 +52,7 @@ public class StudentCardApplication {
                     .email(email)
                     .age(age)
                     .books(new ArrayList<>())
-                    .courses(new ArrayList<>())
+                    .enrolments(new ArrayList<>())
                     .build();
 
             student.addBook(Book
@@ -69,7 +73,21 @@ public class StudentCardApplication {
                     .createdAt(LocalDateTime.now().minusDays(1))
                     .build());
 
-            student.enrolToCourse(course);
+            student.addEnrolment(Enrolment
+                    .builder()
+                    .id(new EnrolmentId(student.getId(), course.getId()))
+                    .student(student)
+                    .course(course)
+                    .createdAt(LocalDateTime.now().minusDays(2))
+                    .build());
+
+            student.addEnrolment(Enrolment
+                    .builder()
+                    .id(new EnrolmentId(student.getId(), secondCourse.getId()))
+                    .student(student)
+                    .course(secondCourse)
+                    .createdAt(LocalDateTime.now().minusDays(4))
+                    .build());
 
             StudentIdCard studentIdCard = StudentIdCard
                     .builder()
